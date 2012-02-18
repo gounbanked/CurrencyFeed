@@ -1,0 +1,11 @@
+
+CurrencyFeed is written by Kasper Souren <kasper@guaka.org>.
+
+CurrencyFeed is a PHP class for up-to-date currency conversions.  At
+construction it does the following:
+   
+   * Retrieve the data from the API
+   * Parse the data
+   * Store data in a MySQL table
+
+
