@@ -35,17 +35,15 @@ class CurrencyFeed {
   
   private $debug = 0;
 
-  function __construct($feed, $base_currency = 'EUR') {
+  function __construct($feed, $base_currency = 'USD') {
     if ($this->debug) {
       print "Using $feed \n";
     }
 
+    $this->base_currency = $base_currency;
     $raw_xml = $this->retrieve($feed);
     $this->parseXML($raw_xml);
     $this->store();
-
-    // Base currency of this table
-    $this->rates[$base_currency] = 1.0;
   }
   
   private function retrieve($feed) {
@@ -57,14 +55,17 @@ class CurrencyFeed {
   private function parseXML($raw_xml) {
     // Parsing the data
     $xml = new SimpleXMLElement($raw_xml);
-    $items = $xml->Cube->Cube->Cube;
+    $items = $xml->conversion;
     $this->rates = array();
-    foreach ($items as $entry) {
-      $currency = (string) $entry->attributes()->currency;
+    foreach ($items as $conversion) {
+      var_dump($conversion);
+      $currency = (string) $conversion->currency;
       $currency = substr($currency, 0, 3);
-      $rate = (float) $entry->attributes()->rate;
+      $rate = (float) $conversion->rate;
       $this->rates[$currency] = $rate;
     }
+    // Base currency of this table
+    $this->rates[$this->base_currency] = 1.0;
   }
 
   private function store() {
@@ -85,7 +86,7 @@ class CurrencyFeed {
     mysql_close();
   }
 
-  public function convert($s, $dest = 'USD') {
+  public function convert($s) {
     /* Given an amount of a foreign currency, convert it into the equivalent in US dollars. For example:
        input: 'JPY 5000'
        output: 'USD 65.58'
@@ -97,10 +98,9 @@ class CurrencyFeed {
     preg_match("/^([A-Z]{3}) ([-+]?([0-9]*\.[0-9]+|[0-9]+))/", $s, $matches);
     $src = $matches[1];
     $amount = $matches[2];
-    
-    $src_rate = $this->rates[$src];
-    $dst_rate = $this->rates[$dest];
-    return $amount / $src_rate * $dst_rate;
+
+    $conversion_rate = $this->rates[$src];
+    return $conversion_rate * $amount;
   }
   
   public function convert_array($arr) {
@@ -118,4 +118,5 @@ class CurrencyFeed {
   }
 
 }
+
 
