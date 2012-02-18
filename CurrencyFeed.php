@@ -58,7 +58,6 @@ class CurrencyFeed {
     $items = $xml->conversion;
     $this->rates = array();
     foreach ($items as $conversion) {
-      var_dump($conversion);
       $currency = (string) $conversion->currency;
       $currency = substr($currency, 0, 3);
       $rate = (float) $conversion->rate;
