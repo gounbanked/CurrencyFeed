@@ -29,11 +29,7 @@ CurrencyFeed (c) 2012 Kasper Souren
 */
 
 
-define('DB_HOST', 'localhost');
-define('DB_USER', 'root');
-define('DB_PASS', '');
-define('DB_NAME', 'currencyfeed');
-
+require_once "config.php";
 
 class CurrencyFeed {
   
